@@ -1,7 +1,7 @@
 # emacs: -*- mode: python-mode; py-indent-offset: 4; indent-tabs-mode: nil -*-
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 """Read and write transforms."""
-from nitransforms.io import afni, fsl, itk, lta
+from nitransforms.io import afni, fsl, itk, lta, x5
 from nitransforms.io.base import TransformIOError, TransformFileError
 
 __all__ = [
@@ -22,6 +22,7 @@ _IO_TYPES = {
     "fs": (lta, "FSLinearTransform"),
     "fsl": (fsl, "FSLLinearTransform"),
     "afni": (afni, "AFNILinearTransform"),
+    "x5": (x5, "X5Transform"),
 }
 
 

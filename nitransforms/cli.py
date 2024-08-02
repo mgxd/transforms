@@ -2,11 +2,13 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import os
 from textwrap import dedent
 
+from nitransforms.base import TransformBase
+from nitransforms.io.base import xfm_loader
+from nitransforms.linear import load as linload
+from nitransforms.nonlinear import load as nlinload
+from nitransforms.resampling import apply
 
-from .linear import load as linload
-from .nonlinear import load as nlinload
-from .resampling import apply
-
+import pprint
 
 def cli_apply(pargs):
     """
@@ -32,8 +34,8 @@ def cli_apply(pargs):
 
     xfm = (
         nlinload(pargs.transform, fmt=fmt)
-        if pargs.nonlinear else
-        linload(pargs.transform, fmt=fmt)
+        if pargs.nonlinear
+        else linload(pargs.transform, fmt=fmt)
     )
 
     # ensure a reference is set
@@ -47,8 +49,43 @@ def cli_apply(pargs):
         cval=pargs.cval,
         prefilter=pargs.prefilter,
     )
-    moved.to_filename(pargs.out or f"nt_{os.path.basename(pargs.moving)}")
+    # moved.to_filename(pargs.out or f"nt_{os.path.basename(pargs.moving)}")
 
+
+def cli_xfm_util(pargs):
+    """ """
+
+    xfm_data = xfm_loader(pargs.transform)
+    xfm_x5 = TransformBase(**xfm_data)
+
+    if pargs.info:
+        pprint.pprint(xfm_x5.x5_struct)
+        print(f"Shape:\n{xfm_x5._shape}")
+        print(f"Affine:\n{xfm_x5._affine}")
+
+    if pargs.x5:
+        filename = f"{os.path.basename(pargs.transform).split('.')[0]}.x5"
+        xfm_x5.to_filename(filename)
+        print(f"Writing out {filename}")
+
+
+def cli_xfm_util(pargs):
+    """
+    """
+
+    xfm_data = xfm_loader(pargs.transform)
+    xfm_x5 = TransformBase(**xfm_data)
+
+    if pargs.info:
+        pprint.pprint(xfm_x5.x5_struct)
+        print(f"Shape:\n{xfm_x5._shape}")
+        print(f"Affine:\n{xfm_x5._affine}")
+
+    if pargs.x5:
+        filename = f"{os.path.basename(pargs.transform).split('.')[0]}.x5"
+        xfm_x5.to_filename(filename)
+        print(f"Writing out {filename}")
+        
 
 def get_parser():
     desc = dedent(
@@ -58,6 +95,7 @@ def get_parser():
         Commands:
 
             apply       Apply a transformation to an image
+            xfm_util    Assorted transform utilities
 
         For command specific information, use 'nt <command> -h'.
     """
@@ -122,6 +160,17 @@ def get_parser():
         help="Determines if the image's data array is prefiltered with a spline filter before "
         "interpolation (default: True)",
     )
+
+    xfm_util = _add_subparser("xfm_util", cli_xfm_util.__doc__)
+    xfm_util.set_defaults(func=cli_xfm_util)
+    xfm_util.add_argument("transform", help="The transform file")
+    xfm_util.add_argument(
+        "--info", action="store_true", help="Get information about the transform"
+    )
+    xfm_util.add_argument(
+        "--x5", action="store_true", help="Convert transform to .x5 file format."
+    )
+
     return parser, subparsers
 
 
@@ -135,3 +184,7 @@ def main(pargs=None):
         subparser = subparsers.choices[pargs.command]
         subparser.print_help()
         raise (e)
+
+
+if __name__ == "__main__":
+    main()
