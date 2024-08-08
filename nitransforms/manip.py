@@ -8,7 +8,6 @@
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Common interface for transforms."""
 from collections.abc import Iterable
-import numpy as np
 
 from .base import (
     TransformBase,
@@ -145,9 +144,9 @@ class TransformChain(TransformBase):
 
         return x
 
-    def asaffine(self, indices=None):
+    def collapse(self):
         """
-        Combine a succession of linear transforms into one.
+        Combine a succession of transforms into one.
 
         Example
         ------
@@ -155,7 +154,7 @@ class TransformChain(TransformBase):
         ...     Affine.from_matvec(vec=(2, -10, 3)),
         ...     Affine.from_matvec(vec=(-2, 10, -3)),
         ... ])
-        >>> chain.asaffine()
+        >>> chain.collapse()
         array([[1., 0., 0., 0.],
                [0., 1., 0., 0.],
                [0., 0., 1., 0.],
@@ -165,7 +164,7 @@ class TransformChain(TransformBase):
         ...     Affine.from_matvec(vec=(1, 2, 3)),
         ...     Affine.from_matvec(mat=[[0, 1, 0], [0, 0, 1], [1, 0, 0]]),
         ... ])
-        >>> chain.asaffine()
+        >>> chain.collapse()
         array([[0., 1., 0., 2.],
                [0., 0., 1., 3.],
                [1., 0., 0., 1.],
@@ -173,7 +172,7 @@ class TransformChain(TransformBase):
 
         >>> np.allclose(
         ...     chain.map((4, -2, 1)),
-        ...     chain.asaffine().map((4, -2, 1)),
+        ...     chain.collapse().map((4, -2, 1)),
         ... )
         True
 
@@ -183,9 +182,8 @@ class TransformChain(TransformBase):
             The indices of the values to extract.
 
         """
-        affines = self.transforms if indices is None else np.take(self.transforms, indices)
-        retval = affines[0]
-        for xfm in affines[1:]:
+        retval = self.transforms[-1]
+        for xfm in reversed(self.transforms[:-1]):
             retval = xfm @ retval
         return retval
 

@@ -61,6 +61,12 @@ def test_itk_h5(tmp_path, testdata_path):
     # A certain tolerance is necessary because of resampling at borders
     assert (np.abs(diff) > 1e-3).sum() / diff.size < RMSE_TOL
 
+    col_moved = xfm.collapse().apply(img_fname, order=0)
+    col_moved.to_filename("nt_collapse_resampled.nii.gz")
+    diff = sw_moved.get_fdata() - col_moved.get_fdata()
+    # A certain tolerance is necessary because of resampling at borders
+    assert (np.abs(diff) > 1e-3).sum() / diff.size < RMSE_TOL
+
 
 @pytest.mark.parametrize("ext0", ["lta", "tfm"])
 @pytest.mark.parametrize("ext1", ["lta", "tfm"])
@@ -82,7 +88,7 @@ def test_collapse_affines(tmp_path, data_path, ext0, ext1, ext2):
         ]
     )
     assert np.allclose(
-        chain.asaffine().matrix,
+        chain.collapse().matrix,
         Affine.from_filename(
             data_path / "regressions" / f"from-fsnative_to-bold_mode-image.{ext2}",
             fmt=f"{FMT[ext2]}",

@@ -377,10 +377,10 @@ def test_mulmat_operator(testdata_path):
     mat2 = from_matvec(np.eye(3), (4, 2, -1))
     aff = nitl.Affine(mat1, reference=ref)
 
-    composed = aff @ mat2
+    composed = aff @ nitl.Affine(mat2)
     assert composed.reference is None
-    assert composed == nitl.Affine(mat1.dot(mat2))
+    assert composed == nitl.Affine(mat2 @ mat1)
 
     composed = nitl.Affine(mat2) @ aff
     assert composed.reference == aff.reference
-    assert composed == nitl.Affine(mat2.dot(mat1), reference=ref)
+    assert composed == nitl.Affine(mat1 @ mat2, reference=ref)

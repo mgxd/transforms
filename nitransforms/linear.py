@@ -124,19 +124,17 @@ should be (0, 0, 0, 1), got %s."""
         True
 
         >>> xfm1 = Affine([[1, 0, 0, 4], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
-        >>> xfm1 @ np.eye(4) == xfm1
+        >>> xfm1 @ Affine() == xfm1
         True
 
         """
-        if not isinstance(b, self.__class__):
-            _b = self.__class__(b)
-        else:
-            _b = b
+        if isinstance(b, self.__class__):
+            return self.__class__(
+                b.matrix @ self.matrix,
+                reference=b.reference,
+            )
 
-        retval = self.__class__(self.matrix.dot(_b.matrix))
-        if _b.reference:
-            retval.reference = _b.reference
-        return retval
+        return b @ self
 
     @property
     def matrix(self):
