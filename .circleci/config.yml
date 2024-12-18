@@ -142,7 +142,8 @@ jobs:
               -v /tmp/data/nitransforms-tests:/data -e TEST_DATA_HOME=/data \
               -e COVERAGE_FILE=/tmp/summaries/.pytest.coverage \
               -v /tmp/fslicense/license.txt:/opt/freesurfer/license.txt:ro \
-              -v /tmp/tests:/tmp nitransforms:latest \
+              -v /tmp/tests:/tmp -e TEST_OUTPUT_DIR=/tmp/artifacts \
+              nitransforms:latest \
               pytest --junit-xml=/tmp/summaries/pytest.xml \
                      --cov nitransforms --cov-report xml:/tmp/summaries/unittests.xml \
                      nitransforms/

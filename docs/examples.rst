@@ -9,3 +9,4 @@ A collection of Jupyter Notebooks to serve as interactive tutorials.
 
     notebooks/isbi2020
     notebooks/Reading and Writing transforms.ipynb
+    notebooks/Visualizing transforms.ipynb

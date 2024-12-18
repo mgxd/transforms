@@ -9,6 +9,8 @@ import tempfile
 _data = None
 _brainmask = None
 _testdir = Path(os.getenv("TEST_DATA_HOME", "~/.nitransforms/testdata")).expanduser()
+_outdir = os.getenv("TEST_OUTPUT_DIR", None)
+
 _datadir = Path(__file__).parent / "tests" / "data"
 
 
@@ -43,6 +45,12 @@ def data_path():
 def testdata_path():
     """Return the heavy test-data folder."""
     return _testdir
+
+
+@pytest.fixture
+def output_path():
+    """Return an output folder."""
+    return Path(_outdir) if _outdir is not None else None
 
 
 @pytest.fixture

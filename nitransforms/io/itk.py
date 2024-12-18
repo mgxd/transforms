@@ -337,7 +337,7 @@ class ITKDisplacementsField(DisplacementsField):
         hdr = imgobj.header.copy()
         shape = hdr.get_data_shape()
 
-        if len(shape) != 5 or shape[-2] != 1 or not shape[-1] in (2, 3):
+        if len(shape) != 5 or shape[-2] != 1 or shape[-1] not in (2, 3):
             raise TransformFileError(
                 'Displacements field "%s" does not come from ITK.'
                 % imgobj.file_map["image"].filename
